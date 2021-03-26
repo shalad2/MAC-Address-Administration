@@ -1,7 +1,6 @@
 <?php
-
-require_once('config.php');
 session_start();
+require_once('data/config.php');
 
 // DB内のloginテーブルからユーザー名を検索
 try{
@@ -17,9 +16,23 @@ try{
 
 // ログインに失敗した時のメッセージ
 $message = <<< EOT
-<h1>MACアドレス管理システム</h1>
-<p>ユーザー名またはパスワードが間違っています。</p>
-<a href="index.php">ログインページに戻る</a>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <meta name="description" content="MACアドレス管理システムログインページ">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/ress@3.0.0/dist/ress.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <h1>MACアドレス管理システム</h1>
+    <p>ユーザー名またはパスワードが間違っています。</p>
+    <a href="index.php">ログインページに戻る</a>
+</body>
+</html>
 EOT;
 
 // loginテーブル内にユーザー名が存在するかを確認
@@ -29,11 +42,14 @@ if(!isset($row['username'])){
 }
 
 // パスワードを確認後、メインページへ移動
-$hash_pass = password_hash($row['password'], PASSWORD_DEFAULT);
-if(password_verify($_POST['password'], $hash_pass)){
-    session_regenerate_id(true); // セクションIDを新しく生成し、置き換える
+if(password_verify($_POST['password'], $row['password'])){
+    //print "before: ".session_id()."\n";
+    session_regenerate_id(TRUE); // セクションIDを新しく生成し、置き換える
     $_SESSION['username'] = $row['username'];
+    session_write_close();
+    //print "after: ".session_id();
     header('Location:main.php');
+    exit();
 }else{
     print $message;
     return false;

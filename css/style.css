@@ -3,11 +3,11 @@
 .login-top {
     text-align: center;
 }
-.login-top input {
+input {
     border: solid 1px;
     border-radius: 5px;
 }
-.login-top button {
+button {
     background-color: aquamarine;
 }
 
