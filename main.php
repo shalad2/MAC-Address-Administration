@@ -1,29 +1,18 @@
 <?php
 session_start();
-
 require_once('data/config.php');
 
 try{
+    require_once('createTables.php');
     $pdo = new PDO(DSN, DB_USER, DB_PASS);
     // print "接続成功\n";
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->exec("CREATE TABLE IF NOT EXISTS address_list (
-        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255),
-        position VARCHAR(50),
-        email VARCHAR(255),
-        device VARCHAR(255),
-        mac_address VARCHAR(50),
-        ip_address VARCHAR(50),
-        registration_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )");
-    $list = $pdo->query('SELECT * FROM address_list');
-    //$stmt->execute([$_POST['username']]);
-    //$row = $stmt->fetch(PDO::FETCH_ASSOC); // 連想番号付きのレコードを取り出す
+    $users_list = $pdo->query("SELECT * FROM users_list ORDER BY id");
 }catch(Exception $e){
-    print $e->getMessage()."\n";
+    $e->getMessage()."\n";
 }
 
+// メインページの表示
 print <<< EOT
 <html lang="ja">
 <head>
@@ -38,57 +27,116 @@ print <<< EOT
 <body class="main-page">
     <h1>MACアドレス管理システム</h1>
     <h2>ようこそ{$_SESSION['username']}さん</h2>
-    <h3>登録リスト</h3>
+    <h3>現在登録済みのMACアドレス</h3>
+    <table>
+        <tr>
+            <th>使用者</th>
+            <th>役職</th>
+            <th>メールアドレス</th>
+            <th>機器名</th>
+            <th>MACアドレス</th>
+            <th>IPアドレス</th>
+            <th>No.</th>
+        </tr>
 EOT;
-while($row = $list->fetch()){
-    print $row[0];
-    print $row[1];
-    print $row[2];
-    print $row[3];
-    print $row[4];
-    print $row[5];
-    print $row[6];
-    print $row[7];
-    print "\n";
+
+// アドレスデータの表示
+$i = 1;
+while($user = $users_list->fetch(PDO::FETCH_ASSOC)){
+    // 使用者の名前でアドレスリストを取得
+    $name = $user['name'];
+    $user_data = $pdo->query("SELECT * FROM address_list WHERE name='$name'");
+    // 使用者のアドレス数を取得
+    $user_data_num = $pdo->query("SELECT count(*) AS cnt FROM address_list WHERE name='$name'")
+        ->fetch(PDO::FETCH_ASSOC);
+    print <<< EOT
+        <tr>
+            <td rowspan={$user_data_num['cnt']}>{$user['name']}</td>
+            <td rowspan={$user_data_num['cnt']}>{$user['position']}</td>
+            <td rowspan={$user_data_num['cnt']}>{$user['email']}</td>
+    EOT;
+    
+    $j = 0;
+    while($row = $user_data->fetch(PDO::FETCH_ASSOC)){
+        if($j == 0){
+            print <<< EOT
+                <td>{$row['device']}</td>
+                <td id="mac-address">{$row['mac_address']}</td>
+                <td>{$row['ip_address']}</td>
+                <td>$i</td>
+            </tr>
+            EOT;
+        }else{
+            print <<< EOT
+            <tr>
+                <td>{$row['device']}</td>
+                <td id="mac-address">{$row['mac_address']}</td>
+                <td>{$row['ip_address']}</td>
+                <td>$i</td>
+            </tr>
+            EOT;
+        }
+        $i++;
+        $j++;
+    }
 }
 
-if($_SESSION['username'] == "admin"){
+print <<< EOT
+</table>
+EOT;
+
+// 管理者であれば編集の表示
+if(in_array($_SESSION['username'], ADMIN)){
     print <<< EOT
-    <p>MACアドレスの新規登録はこちら</p>
-    <form action="addList.php" method="get">
+    <div class="registration">
         <div>
-            <label for="name">使用者</label>
-            <input type="text" name="name" id="name">
+        <h2>MACアドレスの新規登録はこちら</h2>
+        <form action="addAddressList.php" method="get">
+            <span>
+                <label for="name">使用者</label>
+                <input type="text" name="name" id="name">
+            </span>
+            <span>
+                <label for="device">機器名</label>
+                <input type="text" name="device" id="device">
+            </span>
+            <span>
+                <label for="mac_address">MACアドレス</label>
+                <input type="text" name="mac_address" id="mac_address">
+            </span>
+            <span>
+                <label for="ip_address">IPアドレス</label>
+                <input type="text" name="ip_address" id="ip_address">
+            </span>
+            <button id="button" type="submit">新規登録</button>
+        </form>
         </div>
         <div>
-            <label for="position">役職</label>
-            <input type="text" name="position" id="position">
+        <h2>使用者の新規登録はこちら</h2>
+        <form action="addUsersList.php" method="get">
+            <span>
+                <label for="name">使用者</label>
+                <input type="text" name="name" id="name">
+            </span>
+            <span>
+                <label for="position">役職</label>
+                <input type="text" name="position" id="position">
+            </span>
+            <span>
+                <label for="email">メールアドレス</label>
+                <input type="email" name="email" id="email">
+            </span>
+            <button id="button" type="submit">新規登録</button>
+        </form>
         </div>
-        <div>
-            <label for="email">メールアドレス</label>
-            <input type="email" name="email" id="email">
-        </div>
-        <div>
-            <label for="device">機器名</label>
-            <input type="text" name="device" id="device">
-        </div>
-        <div>
-            <label for="mac_address">MACアドレス</label>
-            <input type="text" name="mac_address" id="mac_address">
-        </div>
-        <div>
-            <label for="ip_address">IPアドレス</label>
-            <input type="text" name="ip_address" id="ip_address">
-        </div>
-        <button type="submit">新規登録</button>
-    </form>
+    </div>
     EOT;
 }
 
 print <<< EOT
-    <br>
     <a href="logout.php">ログアウト</a>
 </body>
 </html>
 EOT;
+
 ?>

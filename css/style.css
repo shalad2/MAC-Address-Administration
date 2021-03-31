@@ -1,13 +1,114 @@
 @charset "UTF-8";
 
-.login-top {
+body {
+    color: rgb(71, 54, 54);
     text-align: center;
+    font-size: 1rem;
+	background-color: rgb(208, 216, 210);
+	background-image:
+        linear-gradient(rgb(229, 240, 232) 50%, transparent 50%, transparent);
+    background-size: 10px 10px;
+    background-repeat: repeat;
+}
+h1 {
+    padding-top: 3%;
+    padding-bottom: 2.5%;
+    font-size: 2rem;
+}
+h2 {
+    font-size: 1rem;
+    margin-bottom: 2%;
+}
+p {
+    margin-bottom: 2%;
 }
 input {
+    font-size: 1rem;
     border: solid 1px;
     border-radius: 5px;
+    width: 200px;
+    background-color: rgb(237, 242, 243);
+}
+input[type="text"], input[type="password"] {
+    padding-left: 1%;
 }
 button {
-    background-color: aquamarine;
+    margin-top: 2%;
+    padding: 4px 6px;
+    background-color: rgb(49, 102, 84);
+    border-radius: 5px;
+}
+button:hover {
+    background-color: rgb(54, 148, 117);
+}
+#button {
+    color: rgb(237, 242, 243);
+    font-size: 1rem;
 }
 
+/*ログインページ*/
+.login-top {
+    width: 550px;
+    background-color: white;
+    margin: 10vh auto;
+}
+.login-top div {
+    padding: 1% 0%;
+}
+.login-top form {
+    padding-bottom: 5%;
+}
+
+/*メインページ*/
+.main-page h1 {
+    padding-bottom: 1%;
+}
+.main-page h2 {
+    margin-bottom: 1%;
+}
+table {
+    margin: 1% auto;
+
+}
+.registration {
+    display: flex;
+    width: 90%;
+    margin: 1% auto;
+}
+.registration div {
+    margin: 1% 2%;
+}
+.registration label {
+    float: left;
+    width: 130px;
+    text-align: left;
+}
+.registration input {
+    width: 250px;
+}
+.registration span{
+    display: flex;
+    margin: 2.5% 0%;
+}
+
+table{
+    width: 90%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    background-color: rgb(230, 238, 240);
+}
+table th{
+    color: rgb(237, 242, 243);;
+    background-color:  rgb(49, 102, 84);
+}
+#mac-address {
+    color: rgb(204, 16, 16);
+    background-color: rgb(233, 212, 202);
+    font-weight: bolder;
+}
+
+table th,table td{
+    padding: 10px 0;
+    text-align: center;
+    border: solid rgb(71, 54, 54) 1px;
+}

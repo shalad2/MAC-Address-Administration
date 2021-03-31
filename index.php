@@ -17,31 +17,33 @@ if(isset($_SESSION['username'])){
     <link rel="stylesheet" href="https://unpkg.com/ress@3.0.0/dist/ress.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="login-top">
-    <h1>MACアドレス管理システム</h1>
-    <h2>ようこそ、ログインしてください。</h2>
-    <form action="login.php" method="post">
-        <div>
-            <label for="username">ユーザー名</label>
-            <input type="text" name="username" id="username">
-        </div>
-        <div>
-            <label for="password">パスワード</label>
-            <input type="password" name="password" id="password">
-        </div>
-        <button type="submit">ログイン</button>
-    </form>
-    <p>新規登録はこちらから</p>
-    <form action="signUp.php" method="post">
-        <div>
-            <label for="new-username">ユーザー名</label>
-            <input type="text" name="username" id="new-username">
-        </div>
-        <div>
-            <label for="new-password">パスワード</label>
-            <input type="password" name="password" id="new-password">
-        </div>
-        <button type="submit">新規登録</button>
-    </form>
+<body>
+    <div class="login-top">
+        <h1>MACアドレス管理システム</h1>
+        <h2>ようこそ、ログインしてください。</h2>
+        <form action="login.php" method="post">
+            <div>
+                <label for="username">ユーザー名</label>
+                <input type="text" name="username" id="username">
+            </div>
+            <div>
+                <label for="password">パスワード</label>
+                <input type="password" name="password" id="password">
+            </div>
+            <button id="button" type="submit">ログイン</button>
+        </form>
+        <h2>新規登録はこちらから。</h2>
+        <form action="signUp.php" method="post">
+            <div>
+                <label for="new-username">ユーザー名</label>
+                <input type="text" name="username" id="new-username">
+            </div>
+            <div>
+                <label for="new-password">パスワード</label>
+                <input type="password" name="password" id="new-password">
+            </div>
+            <button id="button" type="submit">新規登録</button>
+        </form>
+    </div>
 </body>
 </html>
