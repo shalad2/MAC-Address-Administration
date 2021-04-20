@@ -18,7 +18,7 @@ print <<< EOT
 <head>
     <meta charset="UTF-8">
     <title>MACアドレス管理システム</title>
-    <meta name="description" content="MACアドレス管理システムメインページ">
+    <meta name="description" content="MACアドレス管理システム履歴ページ">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <!-- CSS -->
     <link rel="stylesheet" href="https://unpkg.com/ress@3.0.0/dist/ress.min.css">
@@ -26,8 +26,7 @@ print <<< EOT
 </head>
 <body class="main-page">
     <h1>MACアドレス管理システム</h1>
-    <h2>ようこそ{$_SESSION['username']}さん</h2>
-    <h3>現在登録済みのMACアドレス</h3>
+    <h3>MACアドレスの登録履歴</h3>
     <table>
         <tr>
             <th>使用者</th>
@@ -41,13 +40,15 @@ print <<< EOT
 EOT;
 
 // アドレスデータの表示
+// i : 通し番号
+// j : 使用者の1番目のアドレスを判定
 $i = 1;
 while($user = $users_list->fetch(PDO::FETCH_ASSOC)){
     // 使用者の名前でアドレスリストを取得
     $name = $user['name'];
-    $user_data = $pdo->query("SELECT * FROM address_list WHERE name='$name' AND valid=1");
-    // 使用者の有効なアドレス数を取得
-    $user_data_num = $pdo->query("SELECT count(*) AS cnt FROM address_list WHERE name='$name' AND valid=1")
+    $user_data = $pdo->query("SELECT * FROM address_list WHERE name='$name'");
+    // 使用者のアドレス数を取得
+    $user_data_num = $pdo->query("SELECT count(*) AS cnt FROM address_list WHERE name='$name'")
         ->fetch(PDO::FETCH_ASSOC);
     // 有効なアドレスがあれば表示
     if($user_data_num['cnt'] != 0){
@@ -60,23 +61,19 @@ while($user = $users_list->fetch(PDO::FETCH_ASSOC)){
         
         $j = 0;
         while($row = $user_data->fetch(PDO::FETCH_ASSOC)){
-            if($j == 0){
-                print <<< EOT
-                    <td>{$row['device']}</td>
-                    <td id="mac-address">{$row['mac_address']}</td>
-                    <td>{$row['ip_address']}</td>
-                    <td>$i</td>
-                </tr>
-                EOT;
+            if($j != 0){
+                print "<tr>";
+            }
+            print "<td>{$row['device']}</td>";
+            if($row['valid'] == 1){
+                print "<td id='mac-address'>{$row['mac_address']}</td>";
             }else{
-                print <<< EOT
-                <tr>
-                    <td>{$row['device']}</td>
-                    <td id="mac-address">{$row['mac_address']}</td>
-                    <td>{$row['ip_address']}</td>
-                    <td>$i</td>
-                </tr>
-                EOT;
+                print "<td id='address-red'>{$row['mac_address']}</td>";
+            }
+            print "<td>{$row['ip_address']}</td>";
+            print "<td>$i</td>";
+            if($j != 0){
+                print "</tr>";
             }
             $i++;
             $j++;
@@ -93,39 +90,35 @@ if(in_array($_SESSION['username'], ADMIN)){
     print <<< EOT
     <div class="registration">
         <div>
-        <h2>MACアドレスの新規登録はこちら</h2>
-        <form action="addAddressList.php" method="get">
+        <h2>使用者の新規登録はこちら</h2>
+        <form action="addUsersList.php" method="get">
             <span>
                 <label for="name">使用者</label>
                 <input type="text" name="name" id="name">
             </span>
             <span>
-                <label for="device">機器名</label>
-                <input type="text" name="device" id="device">
+                <label for="position">役職</label>
+                <input type="text" name="position" id="position">
             </span>
             <span>
-                <label for="mac_address">MACアドレス</label>
-                <input type="text" name="mac_address" id="mac_address">
-            </span>
-            <span>
-                <label for="ip_address">IPアドレス</label>
-                <input type="text" name="ip_address" id="ip_address">
+                <label for="email">メールアドレス</label>
+                <input type="email" name="email" id="email">
             </span>
             <button id="button" type="submit">新規登録</button>
         </form>
         </div>
         <div>
-        <h2>MACアドレスの登録解除はこちら</h2>
-        <form action="deleteAddressList.php" method="get">
+        <h2>MACアドレス履歴の削除はこちら</h2>
+        <form action="deleteHistoryList.php" method="get">
             <span>
-                <label for="mac_address">MACアドレス</label>
-                <input type="text" name="mac_address" id="mac_address">
+            <label for="mac_address">MACアドレス</label>
+            <input type="text" name="mac_address" id="mac_address">
             </span>
             <button id="red-button" type="submit">登録解除</button>
         </form>
         </div>
         <div>
-        <a href="history.php">MACアドレスの登録履歴を見る</a>
+        <a href="main.php">戻る</a>
         <a href="logout.php">ログアウト</a>
         </div> 
     </div>

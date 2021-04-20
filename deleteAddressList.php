@@ -3,9 +3,7 @@ session_start();
 require_once('data/config.php');
 
 // GETで受け取り
-$name = $_GET['name'];
-$position = $_GET['position'];
-$email = $_GET['email'];
+$mac_address = $_GET['mac_address'];
 
 try{
     require_once('createTables.php');
@@ -21,7 +19,7 @@ $head = <<< EOT
 <head>
     <meta charset="UTF-8">
     <title>MACアドレス管理システム</title>
-    <meta name="description" content="MACアドレス管理システム新規使用者追加ページ">
+    <meta name="description" content="MACアドレス管理システムアドレス解除ページ">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <!-- CSS -->
     <link rel="stylesheet" href="https://unpkg.com/ress@3.0.0/dist/ress.min.css">
@@ -31,49 +29,41 @@ $head = <<< EOT
     <h1>MACアドレス管理システム</h1>
 EOT;
 $body = <<< EOT
-<a href="history.php">戻る</a>
+<a href="main.php">戻る</a>
 </body>
 </html>
 EOT;
 
-// 使用者情報がなければ登録
-$isRegistered = $pdo->query("SELECT count(*) AS cnt FROM users_list WHERE name='$name'")
+// 有効なアドレスをリストから削除（無効化）
+$isRegistered = $pdo->query("SELECT count(*) AS cnt FROM address_list WHERE mac_address='$mac_address'")
     ->fetch(PDO::FETCH_ASSOC);
-if($isRegistered['cnt'] > 0){
+if($mac_address == ''){
     print <<< EOT
     $head
-    <p>この使用者は既に登録されています。</p>
+    <p>MACアドレスが入力されていません。</p>
     $body
     EOT;
-}elseif($name == ''){
+}elseif($isRegistered['cnt'] == 0){
     print <<< EOT
     $head
-    <p>使用者が入力されていません。</p>
+    <p>以下のMACアドレスは登録されていません。</p>
+    <table>
+        <tr>
+            <td>MACアドレス</td>
+            <td>$mac_address</td>
+        </tr>
+    </table>
     $body
     EOT;
 }else{
-    $pdo->query("INSERT INTO users_list VALUES (
-        default,
-        '$name',
-        '$position',
-        '$email',
-        default
-    )");
+    $pdo->query("UPDATE address_list SET valid=0 WHERE mac_address='$mac_address'");
     print <<< EOT
     $head
-        <p>以下の内容で使用者を追加しました。</p>
+        <p>以下のMACアドレスを解除しました。</p>
         <table>
             <tr>
-                <td>使用者</td>
-                <td>$name</td>
-            </tr>
-            <tr>
-                <td>役職</td>
-                <td>$position</td>
-            </tr>
-            <tr>
-                <td>メールアドレス</td>
-                <td>$email</td>
+                <td>MACアドレス</td>
+                <td id="address-red">$mac_address</td>
             </tr>
         </table>
     $body
